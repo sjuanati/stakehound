@@ -35,7 +35,6 @@ export class Transactions {
     };
 
     // Go through all incoming transactions at the watch address
-    //processTX(p: Params, elem: [Transaction]): void {
     processTX(p: Params, elem: Transaction[]): void {
         //Discard potential API returns with wrong data
         if (elem.length > 0) {
