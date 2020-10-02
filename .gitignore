@@ -1,4 +1,5 @@
 # node.js
 #
+build/
 node_modules/
 
