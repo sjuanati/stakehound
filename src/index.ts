@@ -6,8 +6,10 @@ const in_watchAddress: string = process.argv[2];    // Account address to receiv
 const in_custodyAddress: string = process.argv[3];  // Account address to transfer ETH tokens
 const in_timer: string = process.argv[4];           // Time interval to listen for transactions
 
+// Core service
 const main = async () => {
 
+    console.log('Service is running...')
     const params = new Params(in_watchAddress, in_custodyAddress, in_timer);
     
     if (params.checkAddress()) {
@@ -17,7 +19,7 @@ const main = async () => {
         const manageTX = async () => {
             const res = await tx.fetchTX(params);
             (res.status === 404) 
-                ? tx.stopTX('Error: URL not found -> Service stopped')
+                ? tx.stopTX('Error: URL not found / no connection -> Service stopped')
                 : (res.data.status) 
                     ? (res.data.status === '1')
                         ? tx.processTX(params, res.data.result)
@@ -25,15 +27,8 @@ const main = async () => {
                     : console.log('Warning: invalid data retrieved');
         };
        
-        setInterval(function () { manageTX() }, params.timer); // Obs: el 1er cop tb trigarà timer segons en executar-se
+        setInterval(function () { manageTX() }, params.timer);
     };
 };
 
 main();
-
-
-// ENHANCEMENTS
-// Verify address checksum with web3.toChecksumAddress(address)
-// Write errors into log file
-// ...
-// 1st execution vs. later executions (append, ....)

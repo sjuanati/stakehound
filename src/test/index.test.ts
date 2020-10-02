@@ -10,10 +10,9 @@ jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 // Mock fs
-jest.mock('fs');
-//const mockedFs = fs as jest.Mocked<typeof fs>;
+jest.mock('fs'); //TBD
 
-// Reset mock function calls before every test
+// Reset mock function calls on every test
 afterEach(() => {
     jest.clearAllMocks();
 });
@@ -32,7 +31,7 @@ describe('Check service parameters: correct fields', () => {
         expect(p.custody_address).toBe(custody_address);
         expect(p.timer).toBe(3000);
         expect(p.last_block).toBe(0);
-        expect(p.DEFAULT_TIMER).toBe(5000);
+        expect(p.DEFAULT_TIMER).toBe(60000);
         expect(p.MAX_BLOCK).toBe(99999999);
     });
     it('isInterval', () => {
@@ -47,7 +46,7 @@ describe('Check service parameters: wrong fields', () => {
     const p = new Params('foo', 'bar', '');
 
     it('isInterval', () => {
-        expect(p.timer).toBe(5000);
+        expect(p.timer).toBe(60000);
     });
     it('isValidAddress', () => {
         expect(p.checkAddress()).toBe(false);
@@ -97,26 +96,5 @@ describe('Transaction: Get last block', () => {
         expect(tx.getLastBlock(elems)).toHaveReturned;
     });
 });
-
-/*
-describe('Transaction: Process transactions', () => {
-    const p = new Params(watch_address, custody_address, timer);
-    const tx = new Transactions();
-
-    const mockWriteable = new PassThrough();
-    fs.createWriteStream.mock
-
-    tx.processTX(p, elems);
-
-    it('processTX', () => {
-        //expect(fs.createWriteStream).toHaveBeenCalled;
-        expect(tx.getLastBlock).toHaveBeenCalled;
-    });
-});
-*/
-
-
-
-// Call functions depending on the parameters (Important!!)
 
 

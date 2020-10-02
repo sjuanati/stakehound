@@ -5,8 +5,8 @@ import { Transaction } from './interfaces/transaction';
 import { Params } from './params';
 
 // Set streams in append mode
-const streamMINT = fs.createWriteStream(path.join(__dirname, 'out/MINT.txt')/*, { flags: 'a' }*/);
-const streamSEND = fs.createWriteStream(path.join(__dirname, 'out/SEND.txt')/*, { flags: 'a' }*/);
+const streamMINT = fs.createWriteStream(path.join(__dirname, 'out/MINT.txt'));
+const streamSEND = fs.createWriteStream(path.join(__dirname, 'out/SEND.txt'));
 
 // Manage transactions
 export class Transactions {
@@ -18,7 +18,7 @@ export class Transactions {
         return new Promise<any>(async (resolve) => {
             await axios.get(`${p.API_URL}?module=account&action=txlist&address=${p.watch_address}&startblock=${p.last_block}&endblock=${p.MAX_BLOCK}&sort=asc`)
                 .then(res => resolve(res))
-                .catch(err => resolve(err.response))
+                .catch(err => (!err.response) ? resolve({ status: 404 }) : resolve(err.response))
         });
     };
 
@@ -26,11 +26,12 @@ export class Transactions {
     writeTX(p: Params, elem: Transaction): void {
         streamMINT.write(`MINT ${elem.value} ${elem.from}` + '\n');
         streamSEND.write(`SEND ${elem.value} ${p.custody_address}` + '\n');
+        console.log(`Tx from sender ${elem.from} and value ${elem.value} has been recorded`);
     };
 
     // Save block+1 from latest transaction as starting point for the next API fetch (optimization)
     getLastBlock(elem: Transaction[]): number {
-        return Number.parseInt(elem[elem.length - 1].blockNumber, 10) + 1;          
+        return Number.parseInt(elem[elem.length - 1].blockNumber, 10) + 1;
     };
 
     // Go through all incoming transactions at the watch address
@@ -46,9 +47,7 @@ export class Transactions {
                         this.writeTX(p, elem[i]);
                         // Update latest block
                         if (i === elem.length - 1) {
-                            console.log('Last block - before', p.last_block);
                             p.last_block = this.getLastBlock(elem);
-                            console.log('Last block - after B', p.last_block);
                         }
                     };
                 };
@@ -57,11 +56,10 @@ export class Transactions {
     };
 
     // When any critical error, stop the application (e.g.: wrong API URL)
-    stopTX(error: string) {
+    stopTX(error: string): void {
         console.log(error);
         streamMINT.end;
         streamSEND.end;
         process.exit();
     }
 };
-
