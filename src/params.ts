@@ -1,7 +1,7 @@
 // Manage service parameters
 export class Params {
 
-    DEFAULT_TIMER: number = 5 * 1000;
+    DEFAULT_TIMER: number = 60 * 1000;
     MAX_BLOCK: number = 99999999;
     API_URL: string = 'https://api-ropsten.etherscan.io/api';
     last_block: number = 0;
