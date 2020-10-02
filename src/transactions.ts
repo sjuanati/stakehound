@@ -4,7 +4,7 @@ import axios from 'axios';
 import { Transaction } from './interfaces/transaction';
 import { Params } from './params';
 
-// Set streams in append mode
+// Set streams in overwrite mode (reloading history when service is launched)
 const streamMINT = fs.createWriteStream(path.join(__dirname, 'out/MINT.txt'));
 const streamSEND = fs.createWriteStream(path.join(__dirname, 'out/SEND.txt'));
 
