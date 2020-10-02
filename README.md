@@ -17,7 +17,9 @@ $ nodemon @param1 @param2 @param3
 
 where:
 @param1 = 'watch' address to listen for incoming transactions. It must be a valid address (0x...)
+
 @param2 = 'custody' address to transfer ETH tokens. It must be a valid address (0x...)
+
 @param3 = time interval in seconds to fetch the incoming transactions to the 'watch address'. It will be 60 seconds by default if no value is defined by parameter.
 
 Execution example:
@@ -29,6 +31,7 @@ $ nodemon 0xb5bE4d2510294d0BA77214F26F704d2956a99072 0xc350d1EA93258BC789CEc0FbE
 ## Technical Considerations
 
 * In order to listen for incoming transactions, a 'setInterval' is executed every N seconds:
+
     `setInterval(function () { manageTX() }, params.timer);`
 * The application will be always up & running execept if the URL for fetching transactions gives an 404 error.
 * If the application stops due to any unforeseen event (server down, atomic bomb, space invaders...), all transactions will be retrieved from block 0 when restarting the app; therefore, files MINT.txt and SEND.txt will be recreated including any transaction between the downtime period and the current date.
@@ -49,4 +52,5 @@ $ pm2 save
 
 ## Conclusion
 
-It's been a great challenge!! Looking forward for new ones ;)
+It's been a great challenge!! Looking forward for new ones 😃
+
