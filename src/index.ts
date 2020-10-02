@@ -32,9 +32,6 @@ const main = async () => {
 main();
 
 
-
-
-
 // ENHANCEMENTS
 // Verify address checksum with web3.toChecksumAddress(address)
 // Write errors into log file

@@ -1,6 +1,9 @@
 import axios from 'axios';
+import fs from 'fs';
 import { Params } from '../params';
 import { Transactions } from '../transactions';
+import { elems } from './data';
+import { PassThrough } from 'stream';
 
 // Mock axios
 jest.mock('axios');
@@ -8,6 +11,7 @@ const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 // Mock fs
 jest.mock('fs');
+//const mockedFs = fs as jest.Mocked<typeof fs>;
 
 // Reset mock function calls before every test
 afterEach(() => {
@@ -21,35 +25,43 @@ const sender_address = '0x1c10a5aabc2555ee3027d5758c4b7b462605f972';
 const timer = '3';
 
 describe('Check service parameters: correct fields', () => {
-    const params = new Params(watch_address, custody_address, timer);
+    const p = new Params(watch_address, custody_address, timer);
 
+    it('constructor', () => {
+        expect(p.watch_address).toBe(watch_address);
+        expect(p.custody_address).toBe(custody_address);
+        expect(p.timer).toBe(3000);
+        expect(p.last_block).toBe(0);
+        expect(p.DEFAULT_TIMER).toBe(5000);
+        expect(p.MAX_BLOCK).toBe(99999999);
+    });
     it('isInterval', () => {
-        expect(params.timer).toBe(3000);
+        expect(p.timer).toBe(3000);
     });
     it('isValidAddress', () => {
-        expect(params.checkAddress()).toBe(true);
+        expect(p.checkAddress()).toBe(true);
     });
 });
 
 describe('Check service parameters: wrong fields', () => {
-    const params = new Params('foo', 'bar', '');
+    const p = new Params('foo', 'bar', '');
 
     it('isInterval', () => {
-        expect(params.timer).toBe(5000);
+        expect(p.timer).toBe(5000);
     });
     it('isValidAddress', () => {
-        expect(params.checkAddress()).toBe(false);
+        expect(p.checkAddress()).toBe(false);
     });
 });
 
 test('API response: data retrieved', async () => {
-    const params = new Params(watch_address, custody_address, timer);
-    const transaction = new Transactions();
-    const tx = [{ blockNumber: '1000', from: sender_address, to: watch_address, value: '500000' }];
-    const res = { status: 200, data: { status: '1', result: tx } };
+    const p = new Params(watch_address, custody_address, timer);
+    const tx = new Transactions();
+    const tx_sample = [{ blockNumber: '1000', from: sender_address, to: watch_address, value: '500000' }];
+    const res = { status: 200, data: { status: '1', result: tx_sample } };
     mockedAxios.get.mockResolvedValue(res);
 
-    return transaction.fetchTX(params).then(data => {
+    return tx.fetchTX(p).then(data => {
         expect(data).toEqual(res);
         expect(data).toHaveReturned;
         expect(data.status).toBe(200);
@@ -60,13 +72,13 @@ test('API response: data retrieved', async () => {
 });
 
 test('API response: error', async () => {
-    const params = new Params(watch_address, custody_address, timer);
-    params.API_URL = 'https://wrong.address';
-    const transaction = new Transactions();
+    const p = new Params(watch_address, custody_address, timer);
+    p.API_URL = 'https://wrong.address';
+    const tx = new Transactions();
     const res = { status: 404, data: 'Error description in HTML' };
     mockedAxios.get.mockResolvedValue(res);
 
-    return transaction.fetchTX(params).then(data => {
+    return tx.fetchTX(p).then(data => {
         expect(data).toEqual(res);
         expect(data).toHaveReturned;
         expect(data.status).not.toBe(200);
@@ -74,5 +86,37 @@ test('API response: error', async () => {
 
     });
 });
+
+describe('Transaction: Get last block', () => {
+    const p = new Params(watch_address, custody_address, timer);
+    const tx = new Transactions()
+
+    it('getLastBlock', () => {
+        expect(tx.getLastBlock(elems)).toBeGreaterThan(p.last_block);
+        expect(tx.getLastBlock(elems)).toEqual(8802783);
+        expect(tx.getLastBlock(elems)).toHaveReturned;
+    });
+});
+
+/*
+describe('Transaction: Process transactions', () => {
+    const p = new Params(watch_address, custody_address, timer);
+    const tx = new Transactions();
+
+    const mockWriteable = new PassThrough();
+    fs.createWriteStream.mock
+
+    tx.processTX(p, elems);
+
+    it('processTX', () => {
+        //expect(fs.createWriteStream).toHaveBeenCalled;
+        expect(tx.getLastBlock).toHaveBeenCalled;
+    });
+});
+*/
+
+
+
+// Call functions depending on the parameters (Important!!)
 
 

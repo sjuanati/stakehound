@@ -16,11 +16,13 @@ export class Params {
         this.custody_address = in_custody;
     };
 
+    // Check if syntaxis for account address is OK
     isValidAddress(addr: string): boolean {
         return (/^(0x)?[0-9a-f]{40}$/i.test(addr));
     };
 
-    checkAddress() {
+    // Check syntaxis for both watch and account addresses before start listening to tx's
+    checkAddress(): boolean {
         if (!this.isValidAddress(this.watch_address)) {
             console.log('Error: Invalid watch address: ', this.watch_address);
             return false;
