@@ -1,16 +1,21 @@
 import axios from 'axios';
-import fs from 'fs';
+//import fs from 'fs';
 import { Params } from '../params';
 import { Transactions } from '../transactions';
 import { elems } from './data';
-import { PassThrough } from 'stream';
 
 // Mock axios
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 // Mock fs
-jest.mock('fs'); //TBD
+// @ts-ignore
+jest.mock('fs', () => ({
+    createWriteStream: jest.fn(() => ({
+        write: jest.fn(),
+        end: jest.fn()
+    }))
+}));
 
 // Reset mock function calls on every test
 afterEach(() => {
@@ -88,13 +93,22 @@ test('API response: error', async () => {
 
 describe('Transaction: Get last block', () => {
     const p = new Params(watch_address, custody_address, timer);
-    const tx = new Transactions()
+    const tx = new Transactions();
 
     it('getLastBlock', () => {
         expect(tx.getLastBlock(elems)).toBeGreaterThan(p.last_block);
-        expect(tx.getLastBlock(elems)).toEqual(8802783);
+        expect(tx.getLastBlock(elems)).toBe(8802783);
         expect(tx.getLastBlock(elems)).toHaveReturned;
     });
 });
 
+describe('Transaction: Process tx', () => {
+    const p = new Params(watch_address, custody_address, timer);
+    const tx = new Transactions();
 
+    tx.processTX(p, elems);
+
+    it('processTX', () => {
+        expect(p.last_block).toBe(8802783);
+    });
+});
