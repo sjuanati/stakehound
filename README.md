@@ -31,7 +31,7 @@ Execution example:
 $ nodemon 0xb5bE4d2510294d0BA77214F26F704d2956a99072 0xc350d1EA93258BC789CEc0FbE283Dc0BA5f5A899 5
 ```
 
-The output files will be stored in `root\out`:
+The output files will be stored in `src/out`:
 
 * MINT.txt with the following content: `MIND [amount] [sender_address]`
 
